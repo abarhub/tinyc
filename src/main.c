@@ -4,152 +4,165 @@
 #include<malloc.h>
 #include<stdlib.h>
 #include<string.h>
+#include<assert.h>
+#include"main.h"
 
-#define MAX_BUFFER (500)
+#define MAX_BUFFER (2000)
 
-enum TokenCode{IDENTIFIER,SEPARATOR,NUMBER};
+/*char* copyStr(char* p) {
+	if (p == NULL) {
+		return NULL;
+	}
+	else {
+		int len = strlen(p);
+		char* buf = malloc(len);
+		int i;
+		for (i = 0; i < len; i++) {
+			buf[i] = p[i];
+		}
+		buf[i] = '\0';
+		return buf;
+	}
+}*/
 
-typedef struct TokenStruct{
-    enum TokenCode code;
-	char *text;
-    struct TokenStruct* next;
-} Token;
-
-char *copyStr(char * p) {
-    if (p == NULL) {
-        return NULL;
-    }
-    else {
-        int len = strlen(p);
-        char* buf = malloc(len);
-        int i;
-        for (i = 0; i < len; i++) {
-            buf[i] = p[i];
-        }
-        buf[i] = '\0';
-        return buf;
-    }
+Token* newToken(enum TokenCode code, char* text, int pos, int line, int column, Token* next) {
+	assert(text != NULL);
+	Token* tmp = calloc(1, sizeof(Token));
+	if (tmp == NULL) {
+		printf("Erreur pour allouer de la mémoire\n");
+		exit(1);
+	}
+	tmp->code = code;
+	tmp->text = strdup(text);
+	tmp->next = next;
+	tmp->pos = pos;
+	tmp->line = line;
+	tmp->column = column;
+	return tmp;
 }
 
 Token* parse(char fichier[]) {
 
-	printf("fichier: %s\n",fichier);
+	printf("fichier: %s\n", fichier);
 
 	FILE* file;
 	int display;
-    char str[MAX_BUFFER];
-    Token *tokenList=NULL;
+	char str[MAX_BUFFER];
+	Token* tokenList = NULL;
+	int pos = 0;
+	int line = 1;
+	int column = 1;
 
-    file = fopen(fichier, "r");
+	file = fopen(fichier, "r");
 
-    if (file == NULL) {
-        printf("Cannot open file %s (errno=%d)\n", fichier, errno);
-        exit(1);
-    }
+	if (file == NULL) {
+		printf("Cannot open file %s (errno=%d)\n", fichier, errno);
+		exit(1);
+	}
 
-    while (fgets(str, MAX_BUFFER, file) != NULL) {
+	while (fgets(str, MAX_BUFFER, file) != NULL) {
 
-        for (int i = 0; i < MAX_BUFFER && str[i] != '\0'; i++) {
-            char c = str[i];
-            if (isalpha(c)) {
-                char buf[MAX_BUFFER+1];
-                int debut = i;
-                buf[0] = c;
-                //debut++;
-                while (isalnum(str[i])&& i < MAX_BUFFER && str[i] != '\0') {
-                    buf[i-debut] = str[i];
-                    buf[i - debut+1] = '\0';
-                    i++;
-                }
-                buf[i - debut] = '\0';
-                printf("ident=%s!\n",buf);
-                Token* tmp = NULL;
-                tmp=calloc(1, sizeof(Token));
-                if (tmp == NULL) {
-                    printf("Erreur pour allouer de la mémoire\n");
-                    exit(1);
-                }
-                tmp->code = IDENTIFIER;
-                tmp->text = strdup(buf);
-                tmp->next = tokenList;
-                tokenList = tmp;
-                printf("tmp->text:%s!\n", buf);
-                printf("tmp->text2:%s!\n", tmp->text);
-            }
-            else if (isdigit(c)) {
-                char buf[MAX_BUFFER + 1];
-                int debut = i;
-                buf[0] = c;
-                while (isdigit(str[i]) && i < MAX_BUFFER && str[i] != '\0') {
-                    buf[i - debut] = str[i];
-                    buf[i - debut + 1] = '\0';
-                    i++;
-                }
-                buf[i - debut] = '\0';
-                Token* tmp = NULL;
-                tmp = calloc(1, sizeof(Token));
-                if (tmp == NULL) {
-                    printf("Erreur pour allouer de la mémoire\n");
-                    exit(1);
-                }
-                tmp->code = NUMBER;
-                tmp->text = strdup(buf);
-                tmp->next = tokenList;
-                tokenList = tmp;
-            }
-            else if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
-                // on ignore
-            } else {
-                Token* tmp = NULL;
-                char buf[2];
-                buf[0] = c;
-                buf[1] = '\0';
-                tmp = calloc(1, sizeof(Token));
-                if (tmp == NULL) {
-                    printf("Erreur pour allouer de la mémoire\n");
-                    exit(1);
-                }
-                tmp->code = SEPARATOR;
-                tmp->text = strdup(buf);
-                tmp->next = tokenList;
-                tokenList = tmp;
+		for (int i = 0; i < MAX_BUFFER && str[i] != '\0'; i++) {
+			char c = str[i];
+			if (isalpha(c)) {
+				char buf[MAX_BUFFER + 1];
+				int debut = i;
+				int len = 1;
+				buf[0] = c;
+				//debut++;
+				while (i < MAX_BUFFER && str[i] != '\0' && isalnum(str[i])) {
+					buf[i - debut] = str[i];
+					buf[i - debut + 1] = '\0';
+					i++;
+					len++;
+				}
+				buf[i - debut] = '\0';
+				printf("ident=%s!\n", buf);
+				Token* tmp = newToken(IDENTIFIER, buf, pos, line, column, tokenList);
+				tokenList = tmp;
+				printf("tmp->text:%s!\n", buf);
+				printf("tmp->text2:%s!\n", tmp->text);
+				pos += len - 1;
+				column += len - 1;
+				if (i < MAX_BUFFER && str[i] != '\0' && !isalnum(str[i])) {
+					i--;
+				}
+			}
+			else if (isdigit(c)) {
+				char buf[MAX_BUFFER + 1];
+				int debut = i;
+				int len = 1;
+				buf[0] = c;
+				while (i < MAX_BUFFER && str[i] != '\0' && isdigit(str[i])) {
+					buf[i - debut] = str[i];
+					buf[i - debut + 1] = '\0';
+					i++;
+					len++;
+				}
+				buf[i - debut] = '\0';
+				Token* tmp = newToken(NUMBER, buf, pos, line, column, tokenList);
+				tokenList = tmp;
+				pos += len - 1;
+				column += len - 1;
+				if (i < MAX_BUFFER && str[i] != '\0' && !isdigit(str[i])) {
+					i--;
+				}
+			}
+			else if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+				// on ignore
+				if (c == '\n' || c == '\r') {
+					if (c == '\n') {
+						column = 1;
+						line++;
+					}
+					pos++;
+				}
+				else {
+					column++;
+					pos++;
+				}
+			}
+			else {
+				Token* tmp = NULL;
+				char buf[2];
+				buf[0] = c;
+				buf[1] = '\0';
+				tmp = newToken(SEPARATOR, buf, pos, line, column, tokenList);
+				tokenList = tmp;
 
-                
-            }
-        }
+				pos++;
+				column++;
+			}
 
-        printf("%s", str);
-    }
+		}
 
-    // closes the file pointed by demo
-    fclose(file);
+		printf("%s", str);
+	}
 
-    return tokenList;
+	// closes the file pointed by demo
+	fclose(file);
+
+	return tokenList;
 }
 
 
 void printToken(Token* tokenList) {
-
-    while (tokenList != NULL) {
-        char* s = tokenList->text;
-        //s = "toto";
-        //if (s) {
-        //    s[1] = '\0';
-        //}
-        printf("code:%d,str:%s!\n",tokenList->code,tokenList->text);
-        tokenList = tokenList->next;
-    }
-
+	while (tokenList != NULL) {
+		printf("code:%d,str:%s,pos=%d,line:%d,col:%d\n",
+			tokenList->code, tokenList->text, tokenList->pos,
+			tokenList->line, tokenList->column);
+		tokenList = tokenList->next;
+	}
 }
 
 void start(int argc, char* argv[]) {
 
 	printf("Coucou\n");
 
-    Token* tokenList = NULL;
+	Token* tokenList = NULL;
 
-    tokenList=parse("..\\..\\..\\exemples\\test1.ci");
+	tokenList = parse("..\\..\\..\\exemples\\test1.ci");
 
-    printToken(tokenList);
+	printToken(tokenList);
 
 }

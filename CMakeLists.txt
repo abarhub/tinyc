@@ -6,6 +6,6 @@ cmake_minimum_required (VERSION 3.8)
 project ("tinyc")
 
 # Ajoutez une source à l'exécutable de ce projet.
-add_executable (tinyc "tinyc.cpp" "tinyc.h" "src/main.c" "src/main.h")
+add_executable (tinyc "tinyc.cpp" "tinyc.h" "src/main.c" "src/main.h" "src/main_test.c" "src/main_test.h")
 
 # TODO: Ajoutez des tests et installez des cibles si nécessaire.
