@@ -49,6 +49,7 @@ extern "C" {
 
 	void printAst(ASTFunction* funct);
 
+	void error(Token* token, char* messageError, ...);
 
 #ifdef __cplusplus
 }

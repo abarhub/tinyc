@@ -26,9 +26,7 @@ void error(Token* token, char* messageError, ...) {
 	}
 
 	va_start(args, messageError);
-	//vfprintf(stderr, str, args);
-	//vprintf(str, args);
-	vprintf(messageError, args);
+	vfprintf(stderr, str, args);
 	va_end(args);
 
 	exit(1);
@@ -140,15 +138,13 @@ Token* parseInstr(Token* tokenList, ASTFunction* funct) {
 		}
 		else {
 			ASTInstr* lastInstr = funct->instr;
-			while (lastInstr != NULL && lastInstr->next != NULL) {
+			assert(lastInstr != NULL);
+			while (lastInstr->next != NULL) {
 				lastInstr = lastInstr->next;
 			}
-			if (lastInstr == NULL) {
-				funct->instr = instr;
-			}
-			else {
-				lastInstr->next = instr;
-			}
+			assert(lastInstr != NULL);
+			assert(lastInstr->next == NULL);
+			lastInstr->next = instr;
 		}
 		current = next(current);
 		if (current->code == SEPARATOR && current->subCode == SC_ASSIGNEMENT) {
