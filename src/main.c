@@ -6,6 +6,7 @@
 #include<string.h>
 #include<assert.h>
 #include"main.h"
+#include"parser.h"
 
 #define MAX_BUFFER (2000)
 
@@ -13,7 +14,7 @@ Token* newToken(enum TokenCode code, char* text, int pos, int line, int column, 
 	assert(text != NULL);
 	Token* tmp = calloc(1, sizeof(Token));
 	if (tmp == NULL) {
-		printf("Erreur pour allouer de la mémoire\n");
+		printf("Erreur pour allouer de la mï¿½moire\n");
 		exit(1);
 	}
 	tmp->code = code;
@@ -25,28 +26,58 @@ Token* newToken(enum TokenCode code, char* text, int pos, int line, int column, 
 	return tmp;
 }
 
-Token* parse(char fichier[]) {
-
-	printf("fichier: %s\n", fichier);
-
+FileStr*readFile(char *fichier) {
 	FILE* file;
-	int display;
-	char str[MAX_BUFFER];
-	Token* tokenList = NULL, * end = NULL;
-	int pos = 0;
-	int line = 1;
-	int column = 1;
+	char buf[MAX_BUFFER];
+	char* str = NULL;
+	FileStr* f = NULL;
 
-	file = fopen(fichier, "r");
+	file = fopen(fichier, "rb");
 
 	if (file == NULL) {
 		printf("Cannot open file %s (errno=%d)\n", fichier, errno);
 		exit(1);
 	}
 
-	while (fgets(str, MAX_BUFFER, file) != NULL) {
+	fseek(file, 0L, SEEK_END);
+	long size = ftell(file);
+	fseek(file, 0L, SEEK_SET);
 
-		for (int i = 0; i < MAX_BUFFER && str[i] != '\0'; i++) {
+	str = malloc(size + 1);
+	fread(str, size, 1, file);
+	str[size] = 0;
+	f = malloc(sizeof(FileStr));
+	f->buf = str;
+	f->size = size;
+
+	// closes the file pointed
+	fclose(file);
+
+	return f;
+}
+
+Token* lexer(char fichier[]) {
+
+	printf("fichier: %s\n", fichier);
+
+	FILE* file;
+	int display;
+	char buf[MAX_BUFFER];
+	char* str=NULL;
+	Token* tokenList = NULL, * end = NULL;
+	int pos = 0;
+	int line = 1;
+	int column = 1;
+	FileStr* f = NULL;
+	
+	f = readFile(fichier);
+	if(f!=NULL){
+
+		str = f->buf;
+		unsigned long size = f->size;
+	//while (fgets(str, MAX_BUFFER, file) != NULL) {
+
+		for (int i = 0; i < size && str[i] != '\0'; i++) {
 			char c = str[i];
 			if (isalpha(c)) {
 				char buf[MAX_BUFFER + 1];
@@ -54,7 +85,7 @@ Token* parse(char fichier[]) {
 				int len = 1;
 				buf[0] = c;
 				//debut++;
-				while (i < MAX_BUFFER && str[i] != '\0' && isalnum(str[i])) {
+				while (i < size && str[i] != '\0' && isalnum(str[i])) {
 					buf[i - debut] = str[i];
 					buf[i - debut + 1] = '\0';
 					i++;
@@ -86,7 +117,7 @@ Token* parse(char fichier[]) {
 				int debut = i;
 				int len = 1;
 				buf[0] = c;
-				while (i < MAX_BUFFER && str[i] != '\0' && isdigit(str[i])) {
+				while (i < size && str[i] != '\0' && isdigit(str[i])) {
 					buf[i - debut] = str[i];
 					buf[i - debut + 1] = '\0';
 					i++;
@@ -147,7 +178,15 @@ Token* parse(char fichier[]) {
 					tmp->subCode = SC_CLOSE_EMBRACE;
 					break;
 				case '=':
-					tmp->subCode = SC_ASSIGNEMENT;
+					if (i + 1 < size && str[i + 1] == '=') {
+						tmp->subCode = SC_EQUALS;
+						i++;
+						pos++;
+						column++;
+					}
+					else {
+						tmp->subCode = SC_ASSIGNEMENT;
+					}
 					break;
 
 				}
@@ -171,8 +210,6 @@ Token* parse(char fichier[]) {
 		printf("%s", str);
 	}
 
-	// closes the file pointed by demo
-	fclose(file);
 
 	return tokenList;
 }
@@ -194,8 +231,12 @@ void start(int argc, char* argv[]) {
 
 	Token* tokenList = NULL;
 
-	tokenList = parse("..\\..\\..\\exemples\\test1.ci");
+	tokenList = lexer("..\\..\\..\\exemples\\test1.ci");
 
 	printToken(tokenList);
+
+	ASTFunction* ast = parse(tokenList);
+
+	printAst(ast);
 
 }

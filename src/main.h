@@ -22,7 +22,7 @@ extern "C" {
 
 	Token* newToken(enum TokenCode code, char* text, int pos, int line, int column, Token* next);
 
-	Token* parse(char fichier[]);
+	Token* lexer(char fichier[]);
 
 	void start(int argc, char* argv[]);
 

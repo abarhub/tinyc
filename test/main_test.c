@@ -40,11 +40,19 @@ void testNewToken() {
 				assert(tokenList->line == line2); \
 				assert(tokenList->column == column2); 
 
+/*CTEST(suite1, test1) {
+}
+
+// there are many different ASSERT macro's (see ctest.h)
+CTEST(suite1, test2) {
+	ASSERT_EQUAL(1, 2);
+}*/
+
 void testParse1() {
 
 	Token* tokenList = NULL;
 
-	tokenList = parse("..\\..\\..\\test\\test1.ci");
+	tokenList = lexer("..\\..\\..\\test\\test1.ci");
 
 	printToken(tokenList);
 
@@ -68,27 +76,27 @@ void testParse1() {
 	assert(tokenList->next != NULL);
 
 	tokenList = tokenList->next;
-	assert_compare(tokenList, IDENTIFIER, "int", 16, 2, 4);
+	assert_compare(tokenList, IDENTIFIER, "int", 17, 2, 4);
 	assert(tokenList->next != NULL);
 
 	tokenList = tokenList->next;
-	assert_compare(tokenList, IDENTIFIER, "x", 20, 2, 8);
+	assert_compare(tokenList, IDENTIFIER, "x", 21, 2, 8);
 	assert(tokenList->next != NULL);
 
 	tokenList = tokenList->next;
-	assert_compare(tokenList, SEPARATOR, "=", 21, 2, 9);
+	assert_compare(tokenList, SEPARATOR, "=", 22, 2, 9);
 	assert(tokenList->next != NULL);
 
 	tokenList = tokenList->next;
-	assert_compare(tokenList, NUMBER, "5", 22, 2, 10);
+	assert_compare(tokenList, NUMBER, "5", 23, 2, 10);
 	assert(tokenList->next != NULL);
 
 	tokenList = tokenList->next;
-	assert_compare(tokenList, SEPARATOR, ";", 23, 2, 11);
+	assert_compare(tokenList, SEPARATOR, ";", 24, 2, 11);
 	assert(tokenList->next != NULL);
 
 	tokenList = tokenList->next;
-	assert_compare(tokenList, SEPARATOR, "}", 26, 4, 1);
+	assert_compare(tokenList, SEPARATOR, "}", 29, 4, 1);
 	assert(tokenList->next == NULL);
 
 }
@@ -98,7 +106,7 @@ void testParsePosition1() {
 
 	Token* tokenList = NULL;
 
-	tokenList = parse("..\\..\\..\\test\\test1.ci");
+	tokenList = lexer("..\\..\\..\\test\\test1.ci");
 
 	printToken(tokenList);
 
