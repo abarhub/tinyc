@@ -2,13 +2,32 @@
 extern "C" {
 #endif
 
+	enum TypeCode {		
+		TYPE_INT, TYPE_STRING, TYPE_VOID
+	};
 
 	typedef struct {
+		enum TypeCode code;
 		char* name;
 	} ASTType;
 
-	typedef struct {
-		int value;
+	enum ExprCode {
+		EXPR_INT, EXPR_VAR, EXPR_ADDI, EXPR_SUBI
+	};
+
+	typedef struct ASTExprS {
+		enum ExprCode code;
+		union uExpr {
+			int value;
+			char* var;
+			struct UOp {
+				struct ASTExprS* expr;
+			};
+			struct BiOp {
+				struct ASTExprS* left;
+				struct ASTExprS* right;
+			};
+		} u;
 	} ASTExpr;
 
 	typedef struct ASTInstr  {
