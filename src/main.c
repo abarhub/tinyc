@@ -9,22 +9,6 @@
 
 #define MAX_BUFFER (2000)
 
-/*char* copyStr(char* p) {
-	if (p == NULL) {
-		return NULL;
-	}
-	else {
-		int len = strlen(p);
-		char* buf = malloc(len);
-		int i;
-		for (i = 0; i < len; i++) {
-			buf[i] = p[i];
-		}
-		buf[i] = '\0';
-		return buf;
-	}
-}*/
-
 Token* newToken(enum TokenCode code, char* text, int pos, int line, int column, Token* next) {
 	assert(text != NULL);
 	Token* tmp = calloc(1, sizeof(Token));
@@ -146,6 +130,27 @@ Token* parse(char fichier[]) {
 				buf[0] = c;
 				buf[1] = '\0';
 				tmp = newToken(SEPARATOR, buf, pos, line, column, NULL);
+				switch (c) {
+				case ';':
+					tmp->subCode = SC_SEMICOLON;
+					break;
+				case '(':
+					tmp->subCode = SC_OPEN_PARENTHESIS;
+					break;
+				case ')':
+					tmp->subCode = SC_CLOSE_PARENTHESIS;
+					break;
+				case '{':
+					tmp->subCode = SC_OPEN_EMBRACE;
+					break;
+				case '}':
+					tmp->subCode = SC_CLOSE_EMBRACE;
+					break;
+				case '=':
+					tmp->subCode = SC_ASSIGNEMENT;
+					break;
+
+				}
 				if (tokenList == NULL) {
 					tokenList = tmp;
 				}
@@ -175,9 +180,10 @@ Token* parse(char fichier[]) {
 
 void printToken(Token* tokenList) {
 	while (tokenList != NULL) {
-		printf("code:%d,str:%s,pos=%d,line:%d,col:%d\n",
+		printf("code:%d,str:%s,pos=%d,line:%d,col:%d,subcode:%d\n",
 			tokenList->code, tokenList->text, tokenList->pos,
-			tokenList->line, tokenList->column);
+			tokenList->line, tokenList->column,
+			tokenList->subCode);
 		tokenList = tokenList->next;
 	}
 }

@@ -123,7 +123,7 @@ void testParsePosition1() {
 				assert(tokenList->column > column);
 			}
 			else {
-				//assert(tokenList->column == 1);
+				assert(tokenList->column >= 1);
 			}
 			pos = tokenList->pos;
 			line = tokenList->line;
