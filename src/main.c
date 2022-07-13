@@ -8,6 +8,7 @@
 #include"main.h"
 #include"lexer.h"
 #include"parser.h"
+#include"run.h"
 
 
 void start(int argc, char* argv[]) {
@@ -23,5 +24,7 @@ void start(int argc, char* argv[]) {
 	ASTFunction* ast = parse(tokenList);
 
 	printAst(ast);
+
+	run(ast);
 
 }
