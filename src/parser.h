@@ -2,11 +2,6 @@
 extern "C" {
 #endif
 
-	typedef struct {
-		char* buf;
-		unsigned long size;
-	} FileStr;
-
 
 	typedef struct {
 		char* name;

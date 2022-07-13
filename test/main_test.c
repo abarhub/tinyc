@@ -4,6 +4,7 @@
 #include<stdlib.h>
 #include<stdbool.h>
 #include"../src/main.h"
+#include"../src/lexer.h"
 
 
 #define assert_eq(x, y) assert(x==y)
@@ -40,13 +41,7 @@ void testNewToken() {
 				assert(tokenList->line == line2); \
 				assert(tokenList->column == column2); 
 
-/*CTEST(suite1, test1) {
-}
 
-// there are many different ASSERT macro's (see ctest.h)
-CTEST(suite1, test2) {
-	ASSERT_EQUAL(1, 2);
-}*/
 
 void testParse1() {
 

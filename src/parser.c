@@ -7,6 +7,7 @@
 #include<assert.h>
 #include<stdbool.h>
 #include"main.h"
+#include"lexer.h"
 #include"parser.h"
 
 void error(char* messageError) {
