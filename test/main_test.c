@@ -2,6 +2,7 @@
 #include<string.h>
 #include<stdio.h>
 #include<stdlib.h>
+#include<stdbool.h>
 #include"../src/main.h"
 
 
@@ -92,10 +93,53 @@ void testParse1() {
 
 }
 
+
+void testParsePosition1() {
+
+	Token* tokenList = NULL;
+
+	tokenList = parse("..\\..\\..\\test\\test1.ci");
+
+	printToken(tokenList);
+
+	assert(tokenList != NULL);
+	bool first = true;
+	int pos = 0, line=1,column=1;
+	while (tokenList != NULL) {
+
+		if (first) {
+			assert(tokenList->pos == 0);
+			assert(tokenList->line == 1);
+			assert(tokenList->column == 1);
+			pos = 0;
+			line = 1;
+			column = 1;
+			first = false;
+		}
+		else {
+			assert(tokenList->pos > pos);
+			assert(tokenList->line >= line);
+			if (tokenList->line == line) {
+				assert(tokenList->column > column);
+			}
+			else {
+				//assert(tokenList->column == 1);
+			}
+			pos = tokenList->pos;
+			line = tokenList->line;
+			column = tokenList->column;
+		}
+
+		tokenList = tokenList->next;
+	}
+
+}
+
 void testParse() {
 
 	testParse1();
 
+	testParsePosition1();
 }
 
 void test_all(void) {
