@@ -31,6 +31,7 @@ extern "C" {
 	} ASTExpr;
 
 	typedef struct ASTInstr  {
+		ASTType* declare;
 		char* var;
 		ASTExpr* expr;
 		struct ASTInstr* next;

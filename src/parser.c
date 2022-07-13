@@ -79,12 +79,43 @@ Token* parseExpr(Token* tokenList, ASTInstr* instr) {
 	return current;
 }
 
+ASTType* parseType(Token** tokenList) {
+	assert(tokenList != NULL);
+	if (isType(*tokenList)) {
+		char* name = (*tokenList)->text;
+		enum TypeCode code;
+		if (strcmp(name, "int") == 0) {
+			code = TYPE_INT;
+		}
+		else if (strcmp(name, "string") == 0) {
+			code = TYPE_STRING;
+		}
+		else if (strcmp(name, "void") == 0) {
+			code = TYPE_VOID;
+		}
+		else {
+			error(*tokenList, "invalid type: '%s'", name);
+		}
+		ASTType* res = malloc(sizeof(ASTType));
+		res->code = code;
+		res->name = name;
+		*tokenList = next(*tokenList);
+		return res;
+	}
+	else {
+		error(*tokenList, "type attendu");
+	}
+	return NULL;
+}
+
 Token* parseInstr(Token* tokenList, ASTFunction* funct) {
 	assert(tokenList != NULL);
 	Token* current = tokenList;
+	ASTType* declare = NULL;
 	if (current->code == IDENTIFIER) {
 		if (isType(current)) {
-			current = next(current);
+			declare = parseType(&current);
+			//current = next(current);
 		}
 	}
 	if (current->code == IDENTIFIER) {
@@ -94,6 +125,7 @@ Token* parseInstr(Token* tokenList, ASTFunction* funct) {
 			error(current, "error for malloc");
 		}
 		instr->var = name;
+		instr->declare = declare;
 		instr->expr = NULL;
 		instr->next = NULL;
 		ASTInstr* lastInstr = funct->instr;
@@ -126,35 +158,6 @@ Token* parseInstr(Token* tokenList, ASTFunction* funct) {
 	}
 
 	return current;
-}
-
-ASTType* parseType(Token** tokenList) {
-	assert(tokenList != NULL);
-	if (isType(*tokenList)) {
-		char* name = (*tokenList)->text;
-		enum TypeCode code;
-		if (strcmp(name, "int") == 0) {
-			code = TYPE_INT;
-		}
-		else if (strcmp(name, "string") == 0) {
-			code = TYPE_STRING;
-		}
-		else if (strcmp(name, "void") == 0) {
-			code = TYPE_VOID;
-		}
-		else {
-			error(*tokenList, "invalid type: '%s'",name);
-		}
-		ASTType* res = malloc(sizeof(ASTType));
-		res->code = code;
-		res->name = name;
-		*tokenList = next(*tokenList);
-		return res;
-	}
-	else {
-		error(*tokenList, "type attendu");
-	}
-	return NULL;
 }
 
 ASTFunction* parse(Token* tokenList) {
@@ -198,6 +201,31 @@ ASTFunction* parse(Token* tokenList) {
 void printAst(ASTFunction* funct) {
 	assert(funct != NULL);
 
-	printf("function: %s\n", funct->name);
+	while (funct != NULL) {
+		printf("function: %s %s(){\n", funct->returnType->name, funct->name);
 
+		ASTInstr* instr = funct->instr;
+		while (instr != NULL) {
+
+			if (instr->declare != NULL) {
+				printf("%s ", instr->declare->name);
+			}
+			printf("%s=", instr->var);
+			switch (instr->expr->code) {
+			case EXPR_INT:
+				printf("%d", instr->expr->u.value);
+				break;
+			case EXPR_VAR:
+				printf("%s", instr->expr->u.var);
+				break;
+			}
+			printf(";\n");
+
+			instr = instr->next;
+		}
+
+		printf("}\n");
+		funct = funct->next;
+
+	}
 }
