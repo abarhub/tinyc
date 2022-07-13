@@ -48,7 +48,7 @@ Token* parse(char fichier[]) {
 	FILE* file;
 	int display;
 	char str[MAX_BUFFER];
-	Token* tokenList = NULL;
+	Token* tokenList = NULL, * end = NULL;
 	int pos = 0;
 	int line = 1;
 	int column = 1;
@@ -78,8 +78,17 @@ Token* parse(char fichier[]) {
 				}
 				buf[i - debut] = '\0';
 				printf("ident=%s!\n", buf);
-				Token* tmp = newToken(IDENTIFIER, buf, pos, line, column, tokenList);
-				tokenList = tmp;
+				Token* tmp = newToken(IDENTIFIER, buf, pos, line, column, NULL);
+				if (tokenList == NULL) {
+					tokenList = tmp;
+				}
+				if (end == NULL) {
+					end = tmp;
+				}
+				else {
+					end->next = tmp;
+					end = tmp;
+				}
 				printf("tmp->text:%s!\n", buf);
 				printf("tmp->text2:%s!\n", tmp->text);
 				pos += len - 1;
@@ -100,8 +109,17 @@ Token* parse(char fichier[]) {
 					len++;
 				}
 				buf[i - debut] = '\0';
-				Token* tmp = newToken(NUMBER, buf, pos, line, column, tokenList);
-				tokenList = tmp;
+				Token* tmp = newToken(NUMBER, buf, pos, line, column, NULL);
+				if (tokenList == NULL) {
+					tokenList = tmp;
+				}
+				if (end == NULL) {
+					end = tmp;
+				}
+				else {
+					end->next = tmp;
+					end = tmp;
+				}
 				pos += len - 1;
 				column += len - 1;
 				if (i < MAX_BUFFER && str[i] != '\0' && !isdigit(str[i])) {
@@ -127,8 +145,17 @@ Token* parse(char fichier[]) {
 				char buf[2];
 				buf[0] = c;
 				buf[1] = '\0';
-				tmp = newToken(SEPARATOR, buf, pos, line, column, tokenList);
-				tokenList = tmp;
+				tmp = newToken(SEPARATOR, buf, pos, line, column, NULL);
+				if (tokenList == NULL) {
+					tokenList = tmp;
+				}
+				if (end == NULL) {
+					end = tmp;
+				}
+				else {
+					end->next = tmp;
+					end = tmp;
+				}
 
 				pos++;
 				column++;

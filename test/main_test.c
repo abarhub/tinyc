@@ -2,7 +2,7 @@
 #include<string.h>
 #include<stdio.h>
 #include<stdlib.h>
-#include"main.h"
+#include"../src/main.h"
 
 
 #define assert_eq(x, y) assert(x==y)
@@ -31,7 +31,13 @@ void testNewToken() {
 	free(tmp2);
 }
 
-#define  assert_compare( tokenList, codeText,  text2,  pos2,  line2,  column2)  assert(tokenList != NULL); assert(tokenList->code == codeText); 	assert(strcmp(tokenList->text, text2) == 0); assert(tokenList->pos == pos2); assert(tokenList->line == line2); assert(tokenList->column == column2); 
+#define  assert_compare( tokenList, codeText,  text2,  pos2,  line2,  column2)  \
+				assert(tokenList != NULL); \
+				assert(tokenList->code == codeText); 	\
+				assert(strcmp(tokenList->text, text2) == 0); \
+				assert(tokenList->pos == pos2); \
+				assert(tokenList->line == line2); \
+				assert(tokenList->column == column2); 
 
 void testParse1() {
 
@@ -41,46 +47,7 @@ void testParse1() {
 
 	printToken(tokenList);
 
-	assert_compare(tokenList, SEPARATOR, "}", 26, 4, 1);
-
-	/*assert(tokenList->code == SEPARATOR);
-	assert(strcmp(tokenList->text,"}")==0);
-	assert(tokenList->pos		== 26);
-	assert(tokenList->line	== 4);
-	assert(tokenList->column == 1);*/
-	assert(tokenList->next != NULL);
-
-	tokenList = tokenList->next;
-
-	assert_compare(tokenList, SEPARATOR, ";", 23, 2, 11);
-	assert(tokenList->next != NULL);
-
-	tokenList = tokenList->next;
-	assert_compare(tokenList, NUMBER, "5", 22, 2, 10);
-	assert(tokenList->next != NULL);
-
-	tokenList = tokenList->next;
-	assert_compare(tokenList, SEPARATOR, "=", 21, 2, 9);
-	assert(tokenList->next != NULL);
-
-	tokenList = tokenList->next;
-	assert_compare(tokenList, IDENTIFIER, "x", 20, 2, 8);
-	assert(tokenList->next != NULL);
-
-	tokenList = tokenList->next;
-	assert_compare(tokenList, IDENTIFIER, "int", 16, 2, 4);
-	assert(tokenList->next != NULL);
-
-	tokenList = tokenList->next;
-	assert_compare(tokenList, SEPARATOR, "{", 11, 1, 12);
-	assert(tokenList->next != NULL);
-
-	tokenList = tokenList->next;
-	assert_compare(tokenList, SEPARATOR, ")", 10, 1, 11);
-	assert(tokenList->next != NULL);
-
-	tokenList = tokenList->next;
-	assert_compare(tokenList, SEPARATOR, "(", 9, 1, 10);
+	assert_compare(tokenList, IDENTIFIER, "void", 0, 1, 1);
 	assert(tokenList->next != NULL);
 
 	tokenList = tokenList->next;
@@ -88,8 +55,41 @@ void testParse1() {
 	assert(tokenList->next != NULL);
 
 	tokenList = tokenList->next;
-	assert_compare(tokenList, IDENTIFIER, "void", 0, 1, 1);
+	assert_compare(tokenList, SEPARATOR, "(", 9, 1, 10);
+	assert(tokenList->next != NULL);
+
+	tokenList = tokenList->next;
+	assert_compare(tokenList, SEPARATOR, ")", 10, 1, 11);
+	assert(tokenList->next != NULL);
+
+	tokenList = tokenList->next;
+	assert_compare(tokenList, SEPARATOR, "{", 11, 1, 12);
+	assert(tokenList->next != NULL);
+
+	tokenList = tokenList->next;
+	assert_compare(tokenList, IDENTIFIER, "int", 16, 2, 4);
+	assert(tokenList->next != NULL);
+
+	tokenList = tokenList->next;
+	assert_compare(tokenList, IDENTIFIER, "x", 20, 2, 8);
+	assert(tokenList->next != NULL);
+
+	tokenList = tokenList->next;
+	assert_compare(tokenList, SEPARATOR, "=", 21, 2, 9);
+	assert(tokenList->next != NULL);
+
+	tokenList = tokenList->next;
+	assert_compare(tokenList, NUMBER, "5", 22, 2, 10);
+	assert(tokenList->next != NULL);
+
+	tokenList = tokenList->next;
+	assert_compare(tokenList, SEPARATOR, ";", 23, 2, 11);
+	assert(tokenList->next != NULL);
+
+	tokenList = tokenList->next;
+	assert_compare(tokenList, SEPARATOR, "}", 26, 4, 1);
 	assert(tokenList->next == NULL);
+
 }
 
 void testParse() {
