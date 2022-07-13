@@ -23,17 +23,19 @@ void runFunct(ASTFunction* funct) {
 		}
 
 		//printf("%s=", instr->var);
-		switch (instr->expr->code) {
-		case EXPR_INT:
-			//printf("%d", instr->expr->u.value);
-			{	
+		if (instr->expr != NULL) {
+			switch (instr->expr->code) {
+			case EXPR_INT:
+				//printf("%d", instr->expr->u.value);
+			{
 				int n = instr->expr->u.value;
-				printf("n=%d\n", n);
+				printf("var %s=%d\n", instr->var, n);
 			}
 			break;
-		case EXPR_VAR:
-			//printf("%s", instr->expr->u.var);
-			break;
+			case EXPR_VAR:
+				//printf("%s", instr->expr->u.var);
+				break;
+			}
 		}
 		//printf(";\n");
 

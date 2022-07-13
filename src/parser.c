@@ -14,14 +14,14 @@
 void error(Token* token, char* messageError, ...) {
 	va_list args;
 
-	char* str="Error: ";
+	char* str = "Error: ";
 	if (token == NULL) {
 		strcat(str, messageError);
 	}
 	else {
 		str = messageError;
 		char* buf = malloc(100);
-		sprintf(buf, " (pos:%d,line:%d,column:%d)", token->pos,token->line,token->column);
+		sprintf(buf, " (pos:%d,line:%d,column:%d)", token->pos, token->line, token->column);
 		strcat(str, buf);
 	}
 
@@ -45,6 +45,14 @@ bool isType(Token* tokenList) {
 	return false;
 }
 
+bool isSeparator(Token* tokenList, enum TokenSubCode separator) {
+	if (tokenList != NULL && tokenList->code == SEPARATOR &&
+		tokenList->subCode == separator) {
+		return true;
+	}
+	return false;
+}
+
 Token* next(Token* tokenList) {
 	if (tokenList != NULL) {
 		return tokenList->next;
@@ -63,7 +71,7 @@ Token* parseExpr(Token* tokenList, ASTInstr* instr) {
 		ASTExpr* expr = malloc(sizeof(ASTExpr));
 		expr->code = EXPR_INT;
 		expr->u.value = n;
-		instr->expr=expr;
+		instr->expr = expr;
 		current = next(current);
 	}
 	else if (current->code == IDENTIFIER) {
@@ -115,7 +123,6 @@ Token* parseInstr(Token* tokenList, ASTFunction* funct) {
 	if (current->code == IDENTIFIER) {
 		if (isType(current)) {
 			declare = parseType(&current);
-			//current = next(current);
 		}
 	}
 	if (current->code == IDENTIFIER) {
@@ -128,23 +135,25 @@ Token* parseInstr(Token* tokenList, ASTFunction* funct) {
 		instr->declare = declare;
 		instr->expr = NULL;
 		instr->next = NULL;
-		ASTInstr* lastInstr = funct->instr;
-		while (lastInstr != NULL) {
-			lastInstr = lastInstr->next;
-		}
-		if (lastInstr == NULL) {
-			funct->instr=instr;
+		if (funct->instr == NULL) {
+			funct->instr = instr;
 		}
 		else {
-			lastInstr->next = instr;
+			ASTInstr* lastInstr = funct->instr;
+			while (lastInstr != NULL && lastInstr->next != NULL) {
+				lastInstr = lastInstr->next;
+			}
+			if (lastInstr == NULL) {
+				funct->instr = instr;
+			}
+			else {
+				lastInstr->next = instr;
+			}
 		}
 		current = next(current);
 		if (current->code == SEPARATOR && current->subCode == SC_ASSIGNEMENT) {
 			current = next(current);
 			current = parseExpr(current, instr);
-		}
-		else {
-			error(current, "invalid token ('=' expected): '%d'", current->code);
 		}
 		if (current && current->code == SEPARATOR && current->subCode == SC_SEMICOLON) {
 			current = next(current);
@@ -182,7 +191,9 @@ ASTFunction* parse(Token* tokenList) {
 					current = next(current);
 					if (current->code == SEPARATOR && current->subCode == SC_OPEN_EMBRACE) {
 						current = next(current);
-						current = parseInstr(current, funct);
+						while (current != NULL && !isSeparator(current, SC_CLOSE_EMBRACE)) {
+							current = parseInstr(current, funct);
+						}
 					}
 				}
 			}
@@ -210,14 +221,17 @@ void printAst(ASTFunction* funct) {
 			if (instr->declare != NULL) {
 				printf("%s ", instr->declare->name);
 			}
-			printf("%s=", instr->var);
-			switch (instr->expr->code) {
-			case EXPR_INT:
-				printf("%d", instr->expr->u.value);
-				break;
-			case EXPR_VAR:
-				printf("%s", instr->expr->u.var);
-				break;
+			printf("%s", instr->var);
+			if (instr->expr != NULL) {
+				printf("=");
+				switch (instr->expr->code) {
+				case EXPR_INT:
+					printf("%d", instr->expr->u.value);
+					break;
+				case EXPR_VAR:
+					printf("%s", instr->expr->u.var);
+					break;
+				}
 			}
 			printf(";\n");
 

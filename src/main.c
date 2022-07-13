@@ -17,7 +17,11 @@ void start(int argc, char* argv[]) {
 
 	Token* tokenList = NULL;
 
-	tokenList = lexer("..\\..\\..\\exemples\\test1.ci");
+	char* file;
+	file= "..\\..\\..\\exemples\\test1.ci";
+	file = "..\\..\\..\\exemples\\test2.ci";
+
+	tokenList = lexer(file);
 
 	printToken(tokenList);
 
