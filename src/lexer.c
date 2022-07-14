@@ -5,11 +5,25 @@
 #include<stdlib.h>
 #include<string.h>
 #include<assert.h>
+#include <stdarg.h>
 #include"main.h"
 #include"lexer.h"
 
 
 #define MAX_BUFFER (2000)
+
+void errorLexer(char* messageError, ...) {
+	va_list args;
+
+	char* str = "Error: ";
+	strcat(str, messageError);
+
+	va_start(args, messageError);
+	vfprintf(stderr, str, args);
+	va_end(args);
+
+	exit(1);
+}
 
 Token* newToken(enum TokenCode code, char* text, int pos, int line, int column, Token* next) {
 	assert(text != NULL);
@@ -192,6 +206,13 @@ Token* lexer(char fichier[]) {
 				case '-':
 					tmp->subCode = SC_MINUS;
 					break;
+				case ',':
+					tmp->subCode = SC_COMMA;
+					break;
+				default:
+				{
+					errorLexer("invalid token: %d", c);
+				}
 				}
 				if (tokenList == NULL) {
 					tokenList = tmp;

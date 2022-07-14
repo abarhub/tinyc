@@ -55,67 +55,101 @@ void runFunct(ASTFunction* funct) {
 	SymbolTable* foundVar = NULL;
 	while (instr != NULL) {
 
-		if (instr->declare != NULL) {
-			SymbolTable* tmp;
-			SymbolTable* found = find(symbolTable, instr->var);
-			if (found == NULL) {
-				tmp = malloc(sizeof(SymbolTable));
-				tmp->next = symbolTable;
-				symbolTable = tmp;
-			}
-			else {
-				tmp = found;
-			}
-
-			tmp->name = instr->var;
-			tmp->type = instr->declare;
-			tmp->value.code = EXPR_INT;
-			tmp->value.u.value = 0;
-		}
-
-		if (instr->var != NULL) {
-			foundVar = find(symbolTable, instr->var);
-			if (foundVar == NULL) {
-				error(NULL, "can't find variable '%s'", instr->expr->u.var);
-			}
-		}
-
-		if (instr->expr != NULL) {
-			switch (instr->expr->code) {
-			case EXPR_INT:
-			{
-				int n = instr->expr->u.value;
-				printf("var %s=%d\n", instr->var, n);
-				if (foundVar != NULL) {
-					foundVar->value.code = RUN_EXPR_INT;
-					foundVar->value.u.value = n;
-				}
-			}
-			break;
-			case EXPR_VAR:
-			{
-				SymbolTable* found = find(symbolTable, instr->expr->u.var);
+		if (instr->code == INSTR_DECLARE) {
+			if (instr->declare != NULL) {
+				SymbolTable* tmp;
+				SymbolTable* found = find(symbolTable, instr->var);
 				if (found == NULL) {
+					tmp = malloc(sizeof(SymbolTable));
+					tmp->next = symbolTable;
+					symbolTable = tmp;
+				}
+				else {
+					tmp = found;
+				}
+
+				tmp->name = instr->var;
+				tmp->type = instr->declare;
+				tmp->value.code = EXPR_INT;
+				tmp->value.u.value = 0;
+			}
+		}
+		else if (instr->code == INSTR_AFFECT) {
+			if (instr->declare != NULL) {
+				SymbolTable* tmp;
+				SymbolTable* found = find(symbolTable, instr->var);
+				if (found == NULL) {
+					tmp = malloc(sizeof(SymbolTable));
+					tmp->next = symbolTable;
+					symbolTable = tmp;
+				}
+				else {
+					tmp = found;
+				}
+
+				tmp->name = instr->var;
+				tmp->type = instr->declare;
+				tmp->value.code = EXPR_INT;
+				tmp->value.u.value = 0;
+			}
+
+			if (instr->var != NULL) {
+				foundVar = find(symbolTable, instr->var);
+				if (foundVar == NULL) {
 					error(NULL, "can't find variable '%s'", instr->expr->u.var);
 				}
-				if (foundVar != NULL) {
-					foundVar->value.code = found->value.code;
-					foundVar->value.u.value = found->value.u.value;
+			}
+
+			if (instr->expr != NULL) {
+				switch (instr->expr->code) {
+				case EXPR_INT:
+				{
+					int n = instr->expr->u.value;
+					printf("var %s=%d\n", instr->var, n);
+					if (foundVar != NULL) {
+						foundVar->value.code = RUN_EXPR_INT;
+						foundVar->value.u.value = n;
+					}
 				}
-				printf("var %s=%d\n", instr->var, found->value.u.value);
+				break;
+				case EXPR_VAR:
+				{
+					SymbolTable* found = find(symbolTable, instr->expr->u.var);
+					if (found == NULL) {
+						error(NULL, "can't find variable '%s'", instr->expr->u.var);
+					}
+					if (foundVar != NULL) {
+						foundVar->value.code = found->value.code;
+						foundVar->value.u.value = found->value.u.value;
+					}
+					printf("var %s=%d\n", instr->var, found->value.u.value);
+				}
+				break;
+				case EXPR_ADDI:
+				{
+					int n1 = 0, n2 = 0;
+					n1 = getIntValue(instr->expr->u.left, symbolTable);
+					n2 = getIntValue(instr->expr->u.right, symbolTable);
+					int res = n1 + n2;
+					printf("var %s=%d\n", instr->var, res);
+					foundVar->value.code = RUN_EXPR_INT;
+					foundVar->value.u.value = res;
+				}
+				}
 			}
-			break;
-			case EXPR_ADDI:
-			{
-				int n1=0, n2=0;
-				n1 = getIntValue(instr->expr->u.left, symbolTable);
-				n2 = getIntValue(instr->expr->u.right, symbolTable);
-				int res = n1 + n2;
-				printf("var %s=%d\n", instr->var, res);
-				foundVar->value.code = RUN_EXPR_INT;
-				foundVar->value.u.value = res;
+		}
+		else if (instr->code == INSTR_CALL) {
+			printf("call %s\n", instr->var);
+			if (strcmp(instr ->var, "print") == 0) {
+				int n = getIntValue(instr->expr, symbolTable);
+				printf("value: %d\n", n);
 			}
+			else {
+				error(NULL, "invalid methode '%s'", instr->var);
 			}
+		}
+		else {
+			error(NULL, "invalid instruction '%s'", instr->code);
 		}
 
 		instr = instr->next;

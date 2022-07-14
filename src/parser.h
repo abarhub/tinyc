@@ -2,7 +2,7 @@
 extern "C" {
 #endif
 
-	enum TypeCode {		
+	enum TypeCode {
 		TYPE_INT, TYPE_STRING, TYPE_VOID
 	};
 
@@ -30,7 +30,12 @@ extern "C" {
 		} u;
 	} ASTExpr;
 
-	typedef struct ASTInstr  {
+	enum InstrCode {
+		INSTR_AFFECT, INSTR_DECLARE, INSTR_CALL
+	};
+
+	typedef struct ASTInstr {
+		enum InstrCode code;
 		ASTType* declare;
 		char* var;
 		ASTExpr* expr;

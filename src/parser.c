@@ -172,6 +172,7 @@ Token* parseInstr(Token* tokenList, ASTFunction* funct) {
 		}
 		instr->var = name;
 		instr->declare = declare;
+		instr->code = INSTR_DECLARE;
 		instr->expr = NULL;
 		instr->next = NULL;
 		if (funct->instr == NULL) {
@@ -189,8 +190,20 @@ Token* parseInstr(Token* tokenList, ASTFunction* funct) {
 		}
 		current = next(current);
 		if (current->code == SEPARATOR && current->subCode == SC_ASSIGNEMENT) {
+			instr->code = INSTR_AFFECT;
 			current = next(current);
 			current = parseExpr(current, instr);
+		}
+		else if (isSeparator(current, SC_OPEN_PARENTHESIS)) {
+			instr->code = INSTR_CALL;
+			current = next(current);
+			current = parseExpr(current, instr);
+			if (isSeparator(current, SC_CLOSE_PARENTHESIS)) {
+				current = next(current);
+			}
+			else {
+				error(current, "invalid token (')' expected): '%d'", current->code);
+			}
 		}
 		if (current && current->code == SEPARATOR && current->subCode == SC_SEMICOLON) {
 			current = next(current);
