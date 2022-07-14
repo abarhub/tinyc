@@ -27,11 +27,32 @@ SymbolTable* find(SymbolTable* symbolTable, char* name) {
 	}
 }
 
+int getIntValue(ASTExpr* expr, SymbolTable* symbolTable) {
+	assert(expr != NULL);
+	assert(symbolTable != NULL);
+	int n;
+	if (expr->code == EXPR_INT) {
+		n = expr->u.value;
+	}
+	else if (expr->code == EXPR_VAR) {
+		SymbolTable* found = find(symbolTable, expr->u.var);
+		if (found == NULL) {
+			error(NULL, "can't find variable '%s'", expr->u.var);
+		}
+		n = found->value.u.value;
+	}
+	else {
+		error(NULL,"expression not implemented");
+	}
+	return n;
+}
+
 void runFunct(ASTFunction* funct) {
 
 
 	ASTInstr* instr = funct->instr;
 	SymbolTable* symbolTable = NULL;
+	SymbolTable* foundVar = NULL;
 	while (instr != NULL) {
 
 		if (instr->declare != NULL) {
@@ -53,8 +74,8 @@ void runFunct(ASTFunction* funct) {
 		}
 
 		if (instr->var != NULL) {
-			SymbolTable* found = find(symbolTable, instr->var);
-			if (found == NULL) {
+			foundVar = find(symbolTable, instr->var);
+			if (foundVar == NULL) {
 				error(NULL, "can't find variable '%s'", instr->expr->u.var);
 			}
 		}
@@ -65,6 +86,10 @@ void runFunct(ASTFunction* funct) {
 			{
 				int n = instr->expr->u.value;
 				printf("var %s=%d\n", instr->var, n);
+				if (foundVar != NULL) {
+					foundVar->value.code = RUN_EXPR_INT;
+					foundVar->value.u.value = n;
+				}
 			}
 			break;
 			case EXPR_VAR:
@@ -73,8 +98,22 @@ void runFunct(ASTFunction* funct) {
 				if (found == NULL) {
 					error(NULL, "can't find variable '%s'", instr->expr->u.var);
 				}
+				if (foundVar != NULL) {
+					foundVar->value.code = found->value.code;
+					foundVar->value.u.value = found->value.u.value;
+				}
 			}
 			break;
+			case EXPR_ADDI:
+			{
+				int n1=0, n2=0;
+				n1 = getIntValue(instr->expr->u.left, symbolTable);
+				n2 = getIntValue(instr->expr->u.right, symbolTable);
+				int res = n1 + n2;
+				printf("var %s=%d\n", instr->var, res);
+				foundVar->value.code = RUN_EXPR_INT;
+				foundVar->value.u.value = res;
+			}
 			}
 		}
 
@@ -93,27 +132,6 @@ void run(ASTFunction* ast) {
 			runFunct(ast);
 		}
 
-		/*ASTInstr* instr = funct->instr;
-		while (instr != NULL) {
-
-			if (instr->declare != NULL) {
-				printf("%s ", instr->declare->name);
-			}
-			printf("%s=", instr->var);
-			switch (instr->expr->code) {
-			case EXPR_INT:
-				printf("%d", instr->expr->u.value);
-				break;
-			case EXPR_VAR:
-				printf("%s", instr->expr->u.var);
-				break;
-			}
-			printf(";\n");
-
-			instr = instr->next;
-		}
-
-		printf("}\n");*/
 		ast = ast->next;
 
 	}

@@ -63,27 +63,27 @@ Token* next(Token* tokenList) {
 ASTExpr* parseExpr2(Token** tokenList) {
 	assert(tokenList != NULL);
 	Token** current = tokenList;
+	ASTExpr* expr_current = NULL;
 
 	if ((*current)->code == NUMBER||(*current)->code == IDENTIFIER){
-		ASTExpr* expr_current=NULL;
 		if ((*current)->code == NUMBER) {
 			int n = atoi((*current)->text);
 			ASTExpr* expr = malloc(sizeof(ASTExpr));
 			expr->code = EXPR_INT;
 			expr->u.value = n;
 			expr_current=expr;
-			current = next(current);
+			*current = next(*current);
 		}
 		else if ((*current)->code == IDENTIFIER) {
 			ASTExpr* expr = malloc(sizeof(ASTExpr));
 			expr->code = EXPR_VAR;
 			expr->u.var = (*current)->text;			
 			expr_current=expr;
-			current = next(current);
+			*current = next(*current);
 		}
 		
 	}
-	return current;
+	return expr_current;
 }
 
 Token* parseExpr(Token* tokenList, ASTInstr* instr) {
@@ -107,7 +107,7 @@ Token* parseExpr(Token* tokenList, ASTInstr* instr) {
 			expr_current=expr;
 			current = next(current);
 		}
-		if(isSeparator(current,EXPR_ADDI)){
+		if(isSeparator(current, SC_ADD)){
 			current = next(current);
 			ASTExpr* expr2 =parseExpr2(&current);
 			if(expr2!=NULL){

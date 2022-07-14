@@ -187,7 +187,12 @@ Token* lexer(char fichier[]) {
 						tmp->subCode = SC_ASSIGNEMENT;
 					}
 					break;
-
+				case '+':
+					tmp->subCode = SC_ADD;
+					break;
+				case '-':
+					tmp->subCode = SC_MINUS;
+					break;
 				}
 				if (tokenList == NULL) {
 					tokenList = tmp;
