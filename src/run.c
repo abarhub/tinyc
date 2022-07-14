@@ -17,12 +17,13 @@ SymbolTable* find(SymbolTable* symbolTable, char* name) {
 		return NULL;
 	}
 	else {
-		while (symbolTable == NULL) {
+		while (symbolTable != NULL) {
 			if (strcmp(symbolTable->name, name) == 0) {
 				return symbolTable;
 			}
 			symbolTable = symbolTable->next;
 		}
+		return NULL;
 	}
 }
 
