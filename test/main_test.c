@@ -6,6 +6,7 @@
 #include"../src/main.h"
 #include"../src/lexer.h"
 #include"parser_test.h"
+#include"interpreter_test.h"
 
 
 #define assert_eq(x, y) assert(x==y)
@@ -154,6 +155,8 @@ void test_all(void) {
 	testParse();
 
 	test_all_parser();
+
+	test_all_interpreter();
 
 	printf("\n\nTests OK\n");
 }
