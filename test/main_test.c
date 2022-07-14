@@ -5,6 +5,7 @@
 #include<stdbool.h>
 #include"../src/main.h"
 #include"../src/lexer.h"
+#include"parser_test.h"
 
 
 #define assert_eq(x, y) assert(x==y)
@@ -151,6 +152,8 @@ void test_all(void) {
 	testNewToken();
 
 	testParse();
+
+	test_all_parser();
 
 	printf("\n\nTests OK\n");
 }

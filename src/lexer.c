@@ -15,11 +15,11 @@ Token* newToken(enum TokenCode code, char* text, int pos, int line, int column, 
 	assert(text != NULL);
 	Token* tmp = calloc(1, sizeof(Token));
 	if (tmp == NULL) {
-		printf("Erreur pour allouer de la m�moire\n");
+		printf("memory allocation error\n");
 		exit(1);
 	}
 	tmp->code = code;
-	tmp->text = strdup(text);
+	tmp->text = _strdup(text);
 	tmp->next = next;
 	tmp->pos = pos;
 	tmp->line = line;
@@ -29,7 +29,6 @@ Token* newToken(enum TokenCode code, char* text, int pos, int line, int column, 
 
 FileStr* readFile(char* fichier) {
 	FILE* file;
-	char buf[MAX_BUFFER];
 	char* str = NULL;
 	FileStr* f = NULL;
 
@@ -77,7 +76,7 @@ Token* lexer(char fichier[]) {
 		str = f->buf;
 		unsigned long size = f->size;
 
-		for (int i = 0; i < size && str[i] != '\0'; i++) {
+		for (unsigned int i = 0; i < size && str[i] != '\0'; i++) {
 			char c = str[i];
 			if (isalpha(c)) {
 				char buf[MAX_BUFFER + 1];

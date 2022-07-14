@@ -10,7 +10,7 @@ add_executable (tinyc "tinyc.cpp" "tinyc.h" "src/main.c" "src/main.h" "src/parse
 
 # TODO: Ajoutez des tests et installez des cibles si nécessaire.
 enable_testing()
-add_executable(main_test2  "test/main_test2.c" "test/main_test.c" "src/main.c"   "src/parser.c" "src/parser.h" "src/lexer.c" "src/lexer.h" "src/run.c" "src/run.h")
+add_executable(main_test2  "test/main_test2.c" "test/main_test.c" "src/main.c"   "src/parser.c" "src/parser.h" "src/lexer.c" "src/lexer.h" "src/run.c" "src/run.h" "test/parser_test.c" "test/parser_test.h")
 #target_link_libraries(test  )
 add_test(NAME  MyTest COMMAND main_test2)
 

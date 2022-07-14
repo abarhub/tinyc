@@ -3,7 +3,6 @@
 
 #include "tinyc.h"
 #include "src/main.h"
-//#include "src/main_test.h"
 
 
 
@@ -11,7 +10,6 @@ using namespace std;
 
 int main()
 {
-	cout << "Hello CMake." << endl;
 	int no=0;
 	//no = 1;
 	if (no == 1) {

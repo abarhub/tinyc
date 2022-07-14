@@ -102,6 +102,7 @@ void runFunct(ASTFunction* funct) {
 					foundVar->value.code = found->value.code;
 					foundVar->value.u.value = found->value.u.value;
 				}
+				printf("var %s=%d\n", instr->var, found->value.u.value);
 			}
 			break;
 			case EXPR_ADDI:
