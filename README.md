@@ -1,6 +1,6 @@
 # tinyc
 
-subset of c language
+Interpreter for subset of c language.
 
 - [x] lexer
 - [ ] parser (work in progress)

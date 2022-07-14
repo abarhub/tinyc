@@ -40,8 +40,8 @@ char *findFile(char *filename)
 		strcat(buf, filename);
 		if (file_exists(buf))
 		{
-			printf("find file: %s",buf);
-			return filename;
+			printf("find file: %s\n",buf);
+			return strdup(buf);
 		}
 	}
 

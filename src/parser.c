@@ -60,24 +60,65 @@ Token* next(Token* tokenList) {
 	}
 }
 
+ASTExpr* parseExpr2(Token** tokenList) {
+	assert(tokenList != NULL);
+	Token** current = tokenList;
+
+	if ((*current)->code == NUMBER||(*current)->code == IDENTIFIER){
+		ASTExpr* expr_current=NULL;
+		if ((*current)->code == NUMBER) {
+			int n = atoi((*current)->text);
+			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			expr->code = EXPR_INT;
+			expr->u.value = n;
+			expr_current=expr;
+			current = next(current);
+		}
+		else if ((*current)->code == IDENTIFIER) {
+			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			expr->code = EXPR_VAR;
+			expr->u.var = (*current)->text;			
+			expr_current=expr;
+			current = next(current);
+		}
+		
+	}
+	return current;
+}
+
 Token* parseExpr(Token* tokenList, ASTInstr* instr) {
 	assert(tokenList != NULL);
 	Token* current = tokenList;
 
-	if (current->code == NUMBER) {
-		int n = atoi(current->text);
-		ASTExpr* expr = malloc(sizeof(ASTExpr));
-		expr->code = EXPR_INT;
-		expr->u.value = n;
-		instr->expr = expr;
-		current = next(current);
-	}
-	else if (current->code == IDENTIFIER) {
-		ASTExpr* expr = malloc(sizeof(ASTExpr));
-		expr->code = EXPR_VAR;
-		expr->u.var = current->text;
-		instr->expr = expr;
-		current = next(current);
+	if (current->code == NUMBER||current->code == IDENTIFIER){
+		ASTExpr* expr_current=NULL;
+		if (current->code == NUMBER) {
+			int n = atoi(current->text);
+			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			expr->code = EXPR_INT;
+			expr->u.value = n;
+			expr_current=expr;
+			current = next(current);
+		}
+		else if (current->code == IDENTIFIER) {
+			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			expr->code = EXPR_VAR;
+			expr->u.var = current->text;			
+			expr_current=expr;
+			current = next(current);
+		}
+		if(isSeparator(current,EXPR_ADDI)){
+			current = next(current);
+			ASTExpr* expr2 =parseExpr2(&current);
+			if(expr2!=NULL){
+				ASTExpr* expr3 = malloc(sizeof(ASTExpr));
+				expr3->code=EXPR_ADDI;
+				expr3->u.left=expr_current;
+				expr3->u.right=expr2;
+				expr_current=expr3;
+			}
+		}
+		instr->expr = expr_current;
 	}
 	else {
 		error(tokenList, "invalid token (expression expected): '%d'", current->code);
