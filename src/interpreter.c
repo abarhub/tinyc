@@ -10,7 +10,7 @@
 #include"main.h"
 #include"lexer.h"
 #include"parser.h"
-#include"run.h"
+#include"interpreter.h"
 
 SymbolTable* find(SymbolTable* symbolTable, char* name) {
 	if (symbolTable == NULL) {

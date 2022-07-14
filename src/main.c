@@ -12,7 +12,7 @@
 #include "main.h"
 #include "lexer.h"
 #include "parser.h"
-#include "run.h"
+#include "interpreter.h"
 
 #if defined(_MSC_VER)
 #include <direct.h>
