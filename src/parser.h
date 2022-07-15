@@ -12,7 +12,7 @@ extern "C" {
 	} ASTType;
 
 	enum ExprCode {
-		EXPR_INT, EXPR_VAR, EXPR_ADDI, EXPR_SUBI
+		EXPR_INT, EXPR_VAR, EXPR_ADDI, EXPR_SUBI, EXPR_STRING
 	};
 
 	typedef struct ASTExprS {
@@ -20,6 +20,7 @@ extern "C" {
 		union uExpr {
 			int value;
 			char* var;
+			char* str;
 			struct UOp {
 				struct ASTExprS* expr;
 			};

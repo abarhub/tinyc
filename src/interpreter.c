@@ -13,6 +13,7 @@
 #include"interpreter.h"
 
 SymbolTable* find(SymbolTable* symbolTable, char* name) {
+	assert(name != NULL);
 	if (symbolTable == NULL) {
 		return NULL;
 	}
@@ -42,9 +43,42 @@ int getIntValue(ASTExpr* expr, SymbolTable* symbolTable) {
 		n = found->value.u.value;
 	}
 	else {
-		error(NULL,"expression not implemented");
+		error(NULL, "expression not implemented");
 	}
 	return n;
+}
+
+SymbolTable* declareVar(SymbolTable** symbolTable, char* var, ASTType* type) {
+	assert(symbolTable != NULL);
+	assert(var != NULL);
+	assert(type != NULL);
+	SymbolTable* tmp;
+	SymbolTable* found = find(*symbolTable, var);
+	if (found == NULL) {
+		tmp = malloc(sizeof(SymbolTable));
+		tmp->next = *symbolTable;
+		*symbolTable = tmp;
+	}
+	else {
+		error(NULL, "var '%s' already declared", var);
+	}
+
+	tmp->name = var;
+	tmp->type = type;
+	switch (type->code) {
+	case TYPE_INT:
+		tmp->value.code = EXPR_INT;
+		tmp->value.u.value = 0;
+		break;
+	case TYPE_STRING:
+		tmp->value.code = EXPR_STRING;
+		tmp->value.u.str = strdup("");
+		break;
+	default:
+		error(NULL, "invalide type '%s' (%d)",
+			type->name, type->code);
+	}
+
 }
 
 void runFunct(ASTFunction* funct) {
@@ -57,40 +91,12 @@ void runFunct(ASTFunction* funct) {
 
 		if (instr->code == INSTR_DECLARE) {
 			if (instr->declare != NULL) {
-				SymbolTable* tmp;
-				SymbolTable* found = find(symbolTable, instr->var);
-				if (found == NULL) {
-					tmp = malloc(sizeof(SymbolTable));
-					tmp->next = symbolTable;
-					symbolTable = tmp;
-				}
-				else {
-					tmp = found;
-				}
-
-				tmp->name = instr->var;
-				tmp->type = instr->declare;
-				tmp->value.code = EXPR_INT;
-				tmp->value.u.value = 0;
+				declareVar(&symbolTable, instr->var, instr->declare);
 			}
 		}
 		else if (instr->code == INSTR_AFFECT) {
 			if (instr->declare != NULL) {
-				SymbolTable* tmp;
-				SymbolTable* found = find(symbolTable, instr->var);
-				if (found == NULL) {
-					tmp = malloc(sizeof(SymbolTable));
-					tmp->next = symbolTable;
-					symbolTable = tmp;
-				}
-				else {
-					tmp = found;
-				}
-
-				tmp->name = instr->var;
-				tmp->type = instr->declare;
-				tmp->value.code = EXPR_INT;
-				tmp->value.u.value = 0;
+				declareVar(&symbolTable, instr->var, instr->declare);
 			}
 
 			if (instr->var != NULL) {
@@ -98,49 +104,63 @@ void runFunct(ASTFunction* funct) {
 				if (foundVar == NULL) {
 					error(NULL, "can't find variable '%s'", instr->expr->u.var);
 				}
+
+				if (instr->expr != NULL) {
+					switch (instr->expr->code) {
+					case EXPR_INT:
+					{
+						int n = instr->expr->u.value;
+						printf("var %s=%d\n", instr->var, n);
+						if (foundVar != NULL) {
+							foundVar->value.code = RUN_EXPR_INT;
+							foundVar->value.u.value = n;
+						}
+					}
+					break;
+					case EXPR_VAR:
+					{
+						SymbolTable* found = find(symbolTable, instr->expr->u.var);
+						if (found == NULL) {
+							error(NULL, "can't find variable '%s'", instr->expr->u.var);
+						}
+						if (foundVar != NULL) {
+							foundVar->value.code = found->value.code;
+							foundVar->value.u.value = found->value.u.value;
+						}
+						printf("var %s=%d\n", instr->var, found->value.u.value);
+					}
+					break;
+					case EXPR_ADDI:
+					{
+						int n1 = 0, n2 = 0;
+						n1 = getIntValue(instr->expr->u.left, symbolTable);
+						n2 = getIntValue(instr->expr->u.right, symbolTable);
+						int res = n1 + n2;
+						printf("var %s=%d\n", instr->var, res);
+						foundVar->value.code = RUN_EXPR_INT;
+						foundVar->value.u.value = res;
+					}
+					break;
+					case EXPR_STRING:
+					{
+						char * str = instr->expr->u.str;
+						printf("var %s=\"%s\"\n", instr->var, str);
+						if (foundVar != NULL) {
+							foundVar->value.code = RUN_EXPR_STR;
+							foundVar->value.u.str= str;
+						}
+					}
+					break;
+					default:
+						error(NULL, "invalide expression (%d)", instr->expr->code);
+					}
+				}
 			}
 
-			if (instr->expr != NULL) {
-				switch (instr->expr->code) {
-				case EXPR_INT:
-				{
-					int n = instr->expr->u.value;
-					printf("var %s=%d\n", instr->var, n);
-					if (foundVar != NULL) {
-						foundVar->value.code = RUN_EXPR_INT;
-						foundVar->value.u.value = n;
-					}
-				}
-				break;
-				case EXPR_VAR:
-				{
-					SymbolTable* found = find(symbolTable, instr->expr->u.var);
-					if (found == NULL) {
-						error(NULL, "can't find variable '%s'", instr->expr->u.var);
-					}
-					if (foundVar != NULL) {
-						foundVar->value.code = found->value.code;
-						foundVar->value.u.value = found->value.u.value;
-					}
-					printf("var %s=%d\n", instr->var, found->value.u.value);
-				}
-				break;
-				case EXPR_ADDI:
-				{
-					int n1 = 0, n2 = 0;
-					n1 = getIntValue(instr->expr->u.left, symbolTable);
-					n2 = getIntValue(instr->expr->u.right, symbolTable);
-					int res = n1 + n2;
-					printf("var %s=%d\n", instr->var, res);
-					foundVar->value.code = RUN_EXPR_INT;
-					foundVar->value.u.value = res;
-				}
-				}
-			}
 		}
 		else if (instr->code == INSTR_CALL) {
 			printf("call %s\n", instr->var);
-			if (strcmp(instr ->var, "print") == 0) {
+			if (strcmp(instr->var, "print") == 0) {
 				int n = getIntValue(instr->expr, symbolTable);
 				printf("value: %d\n", n);
 			}

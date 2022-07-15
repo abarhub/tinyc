@@ -11,6 +11,7 @@ extern "C" {
 		union uRunExpr {
 			int value;
 			char* var;
+			char* str;
 		} u;
 	} RunValue;
 

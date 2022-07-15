@@ -154,7 +154,7 @@ Token* lexer(char fichier[]) {
 				}
 			}
 			else if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
-				// on ignore
+				// ignore new line
 				if (c == '\n' || c == '\r') {
 					if (c == '\n') {
 						column = 1;
@@ -165,6 +165,41 @@ Token* lexer(char fichier[]) {
 				else {
 					column++;
 					pos++;
+				}
+			}
+			else if (c == '\"') {
+				int debut=i;
+				column++;
+				pos++;
+				i++;
+				while (i + 1 < size && str[i + 1] != '\"' && str[i + 1] != '\n' && str[i + 1] != '\r') {
+					i++;
+					column++;
+					pos++;
+				}
+				if (i + 1 < size && str[i + 1] == '\"') {
+					int fin = i;
+					column++;
+					pos++;
+					i++;
+					int size = fin - debut + 1;
+					char* strValue = malloc(size);
+					memset(strValue, 0, size);
+					strncpy(strValue, str + debut+1, size -1);
+					Token* tmp = newToken(STRING, strValue, pos, line, column, NULL);
+					if (tokenList == NULL) {
+						tokenList = tmp;
+					}
+					if (end == NULL) {
+						end = tmp;
+					}
+					else {
+						end->next = tmp;
+						end = tmp;
+					}
+				}
+				else {
+					errorLexer("invalid token: %d", str[i]);
 				}
 			}
 			else {

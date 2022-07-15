@@ -65,7 +65,7 @@ ASTExpr* parseExpr2(Token** tokenList) {
 	Token** current = tokenList;
 	ASTExpr* expr_current = NULL;
 
-	if ((*current)->code == NUMBER||(*current)->code == IDENTIFIER){
+	if ((*current)->code == NUMBER||(*current)->code == IDENTIFIER || (*current)->code == STRING){
 		if ((*current)->code == NUMBER) {
 			int n = atoi((*current)->text);
 			ASTExpr* expr = malloc(sizeof(ASTExpr));
@@ -81,6 +81,16 @@ ASTExpr* parseExpr2(Token** tokenList) {
 			expr_current=expr;
 			*current = next(*current);
 		}
+		else if ((*current)->code == STRING) {
+			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			expr->code = EXPR_STRING;
+			expr->u.str = (*current)->text;
+			expr_current = expr;
+			*current = next(*current);
+		}
+		else {
+			error(tokenList, "invalid token (expression expected): '%d'", (*current)->code);
+		}
 		
 	}
 	return expr_current;
@@ -90,7 +100,7 @@ Token* parseExpr(Token* tokenList, ASTInstr* instr) {
 	assert(tokenList != NULL);
 	Token* current = tokenList;
 
-	if (current->code == NUMBER||current->code == IDENTIFIER){
+	if (current->code == NUMBER||current->code == IDENTIFIER || current->code == STRING){
 		ASTExpr* expr_current=NULL;
 		if (current->code == NUMBER) {
 			int n = atoi(current->text);
@@ -105,6 +115,13 @@ Token* parseExpr(Token* tokenList, ASTInstr* instr) {
 			expr->code = EXPR_VAR;
 			expr->u.var = current->text;			
 			expr_current=expr;
+			current = next(current);
+		}
+		else if (current->code == STRING) {
+			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			expr->code = EXPR_STRING;
+			expr->u.str = current->text;
+			expr_current = expr;
 			current = next(current);
 		}
 		if(isSeparator(current, SC_ADD)){
@@ -268,20 +285,28 @@ void printAst(ASTFunction* funct) {
 		ASTInstr* instr = funct->instr;
 		while (instr != NULL) {
 
-			if (instr->declare != NULL) {
-				printf("%s ", instr->declare->name);
-			}
-			printf("%s", instr->var);
-			if (instr->expr != NULL) {
-				printf("=");
-				switch (instr->expr->code) {
-				case EXPR_INT:
-					printf("%d", instr->expr->u.value);
-					break;
-				case EXPR_VAR:
-					printf("%s", instr->expr->u.var);
-					break;
+			if (instr->code == INSTR_AFFECT || instr->code == INSTR_DECLARE) {
+				if (instr->declare != NULL) {
+					printf("%s ", instr->declare->name);
 				}
+				printf("%s", instr->var);
+				if (instr->expr != NULL) {
+					printf("=");
+					switch (instr->expr->code) {
+					case EXPR_INT:
+						printf("%d", instr->expr->u.value);
+						break;
+					case EXPR_VAR:
+						printf("%s", instr->expr->u.var);
+						break;
+					case EXPR_STRING:
+						printf("\"%s\"", instr->expr->u.str);
+						break;
+					}
+				}
+			}
+			else if (instr->code == INSTR_CALL) {
+				printf("%s()", instr->var);
 			}
 			printf(";\n");
 

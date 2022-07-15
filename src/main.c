@@ -72,6 +72,7 @@ void start(int argc, char *argv[])
 	filename = "test1.ci";
 	filename = "test2.ci";
 	filename = "test3.ci";
+	filename = "test4.ci";
 
 	//filename = "../../exemples/test2.ci";
 
