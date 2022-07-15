@@ -31,7 +31,7 @@ SymbolTable* find(SymbolTable* symbolTable, char* name) {
 int getIntValue(ASTExpr* expr, SymbolTable* symbolTable) {
 	assert(expr != NULL);
 	assert(symbolTable != NULL);
-	int n;
+	int n=0;
 	if (expr->code == EXPR_INT) {
 		n = expr->u.value;
 	}
@@ -40,7 +40,12 @@ int getIntValue(ASTExpr* expr, SymbolTable* symbolTable) {
 		if (found == NULL) {
 			error(NULL, "can't find variable '%s'", expr->u.var);
 		}
-		n = found->value.u.value;
+		if (found->type->code == TYPE_INT) {
+			n = found->value.u.value;
+		}
+		else {
+			error(NULL, "variable '%s' is not int", expr->u.var);
+		}
 	}
 	else {
 		error(NULL, "expression not implemented");
@@ -78,7 +83,7 @@ SymbolTable* declareVar(SymbolTable** symbolTable, char* var, ASTType* type) {
 		error(NULL, "invalide type '%s' (%d)",
 			type->name, type->code);
 	}
-
+	return tmp;
 }
 
 void runFunct(ASTFunction* funct) {
