@@ -54,7 +54,7 @@ void getCurrentDirectory(){
        printf("Current working dir: %s\n", cwd);
    } else {
        perror("getcwd() error");
-       return 1;
+       return ;
    }
 }
 
