@@ -18,11 +18,11 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 # Ajoutez une source à l'exécutable de ce projet.
-add_executable (tinyc "tinyc.cpp" "tinyc.h" "src/main.c" "src/main.h" "src/parser.c" "src/parser.h" "src/lexer.c" "src/lexer.h" "src/interpreter.c" "src/interpreter.h")
+add_executable (tinyc "tinyc.cpp" "tinyc.h" "src/main.c" "src/main.h" "src/parser.c" "src/parser.h" "src/lexer.c" "src/lexer.h" "src/interpreter.c" "src/interpreter.h" "src/tcalloc.c" "src/tcalloc.h" "src/tcstring.c" "src/tcstring.h")
 
 # TODO: Ajoutez des tests et installez des cibles si nécessaire.
 enable_testing()
-add_executable(main_test2  "test/main_test2.c" "test/main_test.c" "src/main.c"   "src/parser.c" "src/parser.h" "src/lexer.c" "src/lexer.h" "src/interpreter.c" "test/interpreter_test.h" "test/parser_test.c" "test/parser_test.h" "test/interpreter_test.c" "test/interpreter_test.h")
+add_executable(main_test2  "test/main_test2.c" "test/main_test.c" "src/main.c"   "src/parser.c" "src/parser.h" "src/lexer.c" "src/lexer.h" "src/interpreter.c" "test/interpreter_test.h" "test/parser_test.c" "test/parser_test.h" "test/interpreter_test.c" "test/interpreter_test.h" "src/tcalloc.c" "src/tcalloc.h" "src/tcstring.c" "src/tcstring.h")
 #target_link_libraries(test  )
 add_test(NAME  MyTest COMMAND main_test2)
 

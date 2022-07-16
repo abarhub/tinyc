@@ -11,6 +11,7 @@
 #include"lexer.h"
 #include"parser.h"
 #include"interpreter.h"
+#include"tcalloc.h"
 
 SymbolTable* find(SymbolTable* symbolTable, char* name) {
 	assert(name != NULL);
@@ -60,7 +61,7 @@ SymbolTable* declareVar(SymbolTable** symbolTable, char* var, ASTType* type) {
 	SymbolTable* tmp;
 	SymbolTable* found = find(*symbolTable, var);
 	if (found == NULL) {
-		tmp = malloc(sizeof(SymbolTable));
+		tmp = tcalloc(sizeof(SymbolTable));
 		tmp->next = *symbolTable;
 		*symbolTable = tmp;
 	}
@@ -138,8 +139,8 @@ void runFunct(ASTFunction* funct) {
 					case EXPR_ADDI:
 					{
 						int n1 = 0, n2 = 0;
-						n1 = getIntValue(instr->expr->u.left, symbolTable);
-						n2 = getIntValue(instr->expr->u.right, symbolTable);
+						n1 = getIntValue(instr->expr->u.biop.left, symbolTable);
+						n2 = getIntValue(instr->expr->u.biop.right, symbolTable);
 						int res = n1 + n2;
 						printf("var %s=%d\n", instr->var, res);
 						foundVar->value.code = RUN_EXPR_INT;

@@ -10,6 +10,7 @@
 #include"main.h"
 #include"lexer.h"
 #include"parser.h"
+#include"tcalloc.h"
 
 void error(Token* token, char* messageError, ...) {
 	va_list args;
@@ -20,7 +21,7 @@ void error(Token* token, char* messageError, ...) {
 	}
 	else {
 		str = messageError;
-		char* buf = malloc(100);
+		char* buf = tcalloc(100);
 		sprintf(buf, " (pos:%d,line:%d,column:%d)", token->pos, token->line, token->column);
 		strcat(str, buf);
 	}
@@ -65,24 +66,24 @@ ASTExpr* parseExpr2(Token** tokenList) {
 	Token** current = tokenList;
 	ASTExpr* expr_current = NULL;
 
-	if ((*current)->code == NUMBER||(*current)->code == IDENTIFIER || (*current)->code == STRING){
+	if ((*current)->code == NUMBER || (*current)->code == IDENTIFIER || (*current)->code == STRING) {
 		if ((*current)->code == NUMBER) {
 			int n = atoi((*current)->text);
-			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			ASTExpr* expr = tcalloc(sizeof(ASTExpr));
 			expr->code = EXPR_INT;
 			expr->u.value = n;
-			expr_current=expr;
+			expr_current = expr;
 			*current = next(*current);
 		}
 		else if ((*current)->code == IDENTIFIER) {
-			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			ASTExpr* expr = tcalloc(sizeof(ASTExpr));
 			expr->code = EXPR_VAR;
-			expr->u.var = (*current)->text;			
-			expr_current=expr;
+			expr->u.var = (*current)->text;
+			expr_current = expr;
 			*current = next(*current);
 		}
 		else if ((*current)->code == STRING) {
-			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			ASTExpr* expr = tcalloc(sizeof(ASTExpr));
 			expr->code = EXPR_STRING;
 			expr->u.str = (*current)->text;
 			expr_current = expr;
@@ -91,7 +92,7 @@ ASTExpr* parseExpr2(Token** tokenList) {
 		else {
 			error(tokenList, "invalid token (expression expected): '%d'", (*current)->code);
 		}
-		
+
 	}
 	return expr_current;
 }
@@ -100,39 +101,39 @@ Token* parseExpr(Token* tokenList, ASTInstr* instr) {
 	assert(tokenList != NULL);
 	Token* current = tokenList;
 
-	if (current->code == NUMBER||current->code == IDENTIFIER || current->code == STRING){
-		ASTExpr* expr_current=NULL;
+	if (current->code == NUMBER || current->code == IDENTIFIER || current->code == STRING) {
+		ASTExpr* expr_current = NULL;
 		if (current->code == NUMBER) {
 			int n = atoi(current->text);
-			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			ASTExpr* expr = tcalloc(sizeof(ASTExpr));
 			expr->code = EXPR_INT;
 			expr->u.value = n;
-			expr_current=expr;
+			expr_current = expr;
 			current = next(current);
 		}
 		else if (current->code == IDENTIFIER) {
-			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			ASTExpr* expr = tcalloc(sizeof(ASTExpr));
 			expr->code = EXPR_VAR;
-			expr->u.var = current->text;			
-			expr_current=expr;
+			expr->u.var = current->text;
+			expr_current = expr;
 			current = next(current);
 		}
 		else if (current->code == STRING) {
-			ASTExpr* expr = malloc(sizeof(ASTExpr));
+			ASTExpr* expr = tcalloc(sizeof(ASTExpr));
 			expr->code = EXPR_STRING;
 			expr->u.str = current->text;
 			expr_current = expr;
 			current = next(current);
 		}
-		if(isSeparator(current, SC_ADD)){
+		if (isSeparator(current, SC_ADD)) {
 			current = next(current);
-			ASTExpr* expr2 =parseExpr2(&current);
-			if(expr2!=NULL){
-				ASTExpr* expr3 = malloc(sizeof(ASTExpr));
-				expr3->code=EXPR_ADDI;
-				expr3->u.left=expr_current;
-				expr3->u.right=expr2;
-				expr_current=expr3;
+			ASTExpr* expr2 = parseExpr2(&current);
+			if (expr2 != NULL) {
+				ASTExpr* expr3 = tcalloc(sizeof(ASTExpr));
+				expr3->code = EXPR_ADDI;
+				expr3->u.biop.left = expr_current;
+				expr3->u.biop.right = expr2;
+				expr_current = expr3;
 			}
 		}
 		instr->expr = expr_current;
@@ -160,7 +161,7 @@ ASTType* parseType(Token** tokenList) {
 		else {
 			error(*tokenList, "invalid type: '%s'", name);
 		}
-		ASTType* res = malloc(sizeof(ASTType));
+		ASTType* res = tcalloc(sizeof(ASTType));
 		res->code = code;
 		res->name = name;
 		*tokenList = next(*tokenList);
@@ -183,7 +184,7 @@ Token* parseInstr(Token* tokenList, ASTFunction* funct) {
 	}
 	if (current->code == IDENTIFIER) {
 		char* name = current->text;
-		ASTInstr* instr = malloc(sizeof(ASTInstr));
+		ASTInstr* instr = tcalloc(sizeof(ASTInstr));
 		if (instr == NULL) {
 			error(current, "error for malloc");
 		}
@@ -245,7 +246,7 @@ ASTFunction* parse(Token* tokenList) {
 		ASTType* returnType = parseType(&current);
 		if (current->code == IDENTIFIER) {
 			char* name = current->text;
-			ASTFunction* funct = malloc(sizeof(ASTFunction));
+			ASTFunction* funct = tcalloc(sizeof(ASTFunction));
 			funct->name = name;
 			funct->returnType = returnType;
 			funct->next = NULL;

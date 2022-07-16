@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include"main.h"
 #include"lexer.h"
+#include"tcalloc.h"
 
 
 #define MAX_BUFFER (2000)
@@ -27,7 +28,7 @@ void errorLexer(char* messageError, ...) {
 
 Token* newToken(enum TokenCode code, char* text, int pos, int line, int column, Token* next) {
 	assert(text != NULL);
-	Token* tmp = calloc(1, sizeof(Token));
+	Token* tmp = tcalloc(sizeof(Token));
 	if (tmp == NULL) {
 		printf("memory allocation error\n");
 		exit(1);
@@ -57,10 +58,10 @@ FileStr* readFile(char* fichier) {
 	long size = ftell(file);
 	fseek(file, 0L, SEEK_SET);
 
-	str = malloc(size + 1);
+	str = tcalloc(size + 1);
 	fread(str, size, 1, file);
 	str[size] = 0;
-	f = malloc(sizeof(FileStr));
+	f = tcalloc(sizeof(FileStr));
 	f->buf = str;
 	f->size = size;
 

@@ -1,3 +1,6 @@
+#ifndef PARSER_H
+#define PARSER_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,11 +26,11 @@ extern "C" {
 			char* str;
 			struct UOp {
 				struct ASTExprS* expr;
-			};
+			} uop;
 			struct BiOp {
 				struct ASTExprS* left;
 				struct ASTExprS* right;
-			};
+			} biop;
 		} u;
 	} ASTExpr;
 
@@ -61,3 +64,5 @@ extern "C" {
 }
 #endif
 
+
+#endif

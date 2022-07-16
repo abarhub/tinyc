@@ -1,3 +1,6 @@
+#ifndef INTERPRETER_H
+#define INTERPRETER_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,3 +33,4 @@ extern "C" {
 }
 #endif
 
+#endif

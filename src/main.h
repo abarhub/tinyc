@@ -1,3 +1,5 @@
+#ifndef MAIN_H
+#define MAIN_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -10,3 +12,4 @@ extern "C" {
 
 
 
+#endif
