@@ -22,34 +22,31 @@
 #include <unistd.h>
 #endif
 
-bool file_exists(char *filename)
+bool file_exists(char* filename)
 {
 	struct stat buffer;
 	return (stat(filename, &buffer) == 0);
 }
 
-char *findFile(char *filename)
+char* findFile(char* filename)
 {
 	for (int j = 0; j < 5; j++)
 	{
 		//char buf[2000] = "";
-		char *buf = "";
+		char* buf = "";
 		TCString* s = newstr("");
 
 		for (int i = 0; i < j; i++)
 		{
-			//strcat(buf, "../");
-			tcstrcat(s, newstr("../"));
+			tcstrcatc(s, "../");
 		}
-		//strcat(buf, "exemples/");
-		//strcat(buf, filename);
-		tcstrcat(s, newstr("exemples/"));
-		tcstrcat(s, newstr(filename));
+		tcstrcatc(s, "exemples/");
+		tcstrcatc(s, filename);
 		buf = tctoC(s);
 		freestr(s);
 		if (file_exists(buf))
 		{
-			printf("find file: %s\n",buf);
+			printf("find file: %s\n", buf);
 			return strdup(buf);
 		}
 	}
@@ -57,27 +54,28 @@ char *findFile(char *filename)
 	return NULL;
 }
 
-void getCurrentDirectory(){
+void getCurrentDirectory() {
 	char cwd[500];
-   if (getcwd(cwd, sizeof(cwd)) != NULL) {
-       printf("Current working dir: %s\n", cwd);
-   } else {
-       perror("getcwd() error");
-       return ;
-   }
+	if (getcwd(cwd, sizeof(cwd)) != NULL) {
+		printf("Current working dir: %s\n", cwd);
+	}
+	else {
+		perror("getcwd() error");
+		return;
+	}
 }
 
-void start(int argc, char *argv[])
+void start(int argc, char* argv[])
 {
 
 	printf("Coucou\n");
 
-	Token *tokenList = NULL;
+	Token* tokenList = NULL;
 
 	getCurrentDirectory();
 
-	char *filename;
-	char *file;
+	char* filename;
+	char* file;
 	filename = "test1.ci";
 	filename = "test2.ci";
 	filename = "test3.ci";
@@ -94,7 +92,7 @@ void start(int argc, char *argv[])
 
 	printToken(tokenList);
 
-	ASTFunction *ast = parse(tokenList);
+	ASTFunction* ast = parse(tokenList);
 
 	printAst(ast);
 

@@ -6,9 +6,11 @@ typedef struct TCString {
 	char* buf;
 } TCString;
 
-TCString* newstr(char* s);
+TCString* newstr(const char* s);
 
 void tcstrcat(TCString* src, TCString* append);
+
+void tcstrcatc(TCString* src, char const* append);
 
 char* tctoC(TCString* src);
 

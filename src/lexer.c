@@ -9,6 +9,7 @@
 #include"main.h"
 #include"lexer.h"
 #include"tcalloc.h"
+#include"tcstring.h"
 
 
 #define MAX_BUFFER (2000)
@@ -16,12 +17,15 @@
 void errorLexer(char* messageError, ...) {
 	va_list args;
 
-	char* str = "Error: ";
-	strcat(str, messageError);
+	TCString* str = newstr("Error: ");
+	tcstrcatc(str, messageError);
 
+	char const* s = tctoC(str);
+	freestr(str);
 	va_start(args, messageError);
-	vfprintf(stderr, str, args);
+	vfprintf(stderr, s, args);
 	va_end(args);
+	free(s);
 
 	exit(1);
 }

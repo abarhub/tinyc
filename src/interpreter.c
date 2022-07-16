@@ -32,7 +32,7 @@ SymbolTable* find(SymbolTable* symbolTable, char* name) {
 int getIntValue(ASTExpr* expr, SymbolTable* symbolTable) {
 	assert(expr != NULL);
 	assert(symbolTable != NULL);
-	int n=0;
+	int n = 0;
 	if (expr->code == EXPR_INT) {
 		n = expr->u.value;
 	}
@@ -58,7 +58,7 @@ SymbolTable* declareVar(SymbolTable** symbolTable, char* var, ASTType* type) {
 	assert(symbolTable != NULL);
 	assert(var != NULL);
 	assert(type != NULL);
-	SymbolTable* tmp;
+	SymbolTable* tmp = NULL;
 	SymbolTable* found = find(*symbolTable, var);
 	if (found == NULL) {
 		tmp = tcalloc(sizeof(SymbolTable));
@@ -149,11 +149,11 @@ void runFunct(ASTFunction* funct) {
 					break;
 					case EXPR_STRING:
 					{
-						char * str = instr->expr->u.str;
+						char* str = instr->expr->u.str;
 						printf("var %s=\"%s\"\n", instr->var, str);
 						if (foundVar != NULL) {
 							foundVar->value.code = RUN_EXPR_STR;
-							foundVar->value.u.str= str;
+							foundVar->value.u.str = str;
 						}
 					}
 					break;

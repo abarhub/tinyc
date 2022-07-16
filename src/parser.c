@@ -12,7 +12,7 @@
 #include"parser.h"
 #include"tcalloc.h"
 
-void error(Token* token, char* messageError, ...) {
+void error(Token* token, const char* messageError, ...) {
 	va_list args;
 
 	char* str = "Error: ";
