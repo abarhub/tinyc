@@ -12,4 +12,6 @@ void tcstrcat(TCString* src, TCString* append);
 
 char* tctoC(TCString* src);
 
+void freestr(TCString* src);
+
 #endif

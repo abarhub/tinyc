@@ -13,6 +13,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "interpreter.h"
+#include "tcstring.h"
 
 #if defined(_MSC_VER)
 #include <direct.h>
@@ -31,13 +32,21 @@ char *findFile(char *filename)
 {
 	for (int j = 0; j < 5; j++)
 	{
-		char buf[2000] = "";
+		//char buf[2000] = "";
+		char *buf = "";
+		TCString* s = newstr("");
+
 		for (int i = 0; i < j; i++)
 		{
-			strcat(buf, "../");
+			//strcat(buf, "../");
+			tcstrcat(s, newstr("../"));
 		}
-		strcat(buf, "exemples/");
-		strcat(buf, filename);
+		//strcat(buf, "exemples/");
+		//strcat(buf, filename);
+		tcstrcat(s, newstr("exemples/"));
+		tcstrcat(s, newstr(filename));
+		buf = tctoC(s);
+		freestr(s);
 		if (file_exists(buf))
 		{
 			printf("find file: %s\n",buf);
